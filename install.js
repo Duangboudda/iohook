@@ -31,7 +31,7 @@ function install(runtime, abi, platform, arch, cb) {
 
   console.log('Downloading prebuild for platform:', currentPlatform);
   let downloadUrl =
-    'https://github.com/SpaceK33z/iohook/releases/download/v' +
+    'https://github.com/mhgbrown/iohook/releases/download/v' +
     pkgVersion +
     '/' +
     currentPlatform +
@@ -78,6 +78,8 @@ function install(runtime, abi, platform, arch, cb) {
         console.error('# npm run build');
         console.error('');
       }
+
+      return;
     }
 
     let options = {

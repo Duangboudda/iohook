@@ -33,6 +33,7 @@ function initBuild() {
     targets = [[argv['runtime'], argv['version'], argv['abi']]];
   } else if ('all' in argv) {
     // If "--all", use those defined in package.json
+    // https://www.electronjs.org/docs/latest/tutorial/electron-timelines
     targets = require('./package.json').supportedTargets;
   } else {
     const options = optionsFromPackage();
@@ -140,12 +141,14 @@ function build(runtime, version, abi) {
       '--arch=' + arch,
     ];
 
-    if (/^electron/i.test(runtime)) {
+    const isElectron = /^electron/i.test(runtime);
+    if (isElectron) {
       args.push('--dist-url=https://electronjs.org/headers');
     }
 
     if (parseInt(abi) >= 80) {
-      if (arch === 'x64') {
+      // Fix build for electron macOS arm64
+      if (arch === 'x64' || (arch === 'arm64' && isElectron)) {
         args.push('--v8_enable_pointer_compression=1');
       } else {
         args.push('--v8_enable_pointer_compression=0');
@@ -164,6 +167,7 @@ function build(runtime, version, abi) {
     console.log('Building iohook for ' + runtime + ' v' + version + '>>>>');
     if (process.platform === 'win32') {
       if (version.split('.')[0] >= 4) {
+        // https://blog.knatten.org/2022/08/26/microsoft-c-versions-explained/
         process.env.msvs_toolset = 15;
         process.env.msvs_version = argv.msvs_version || 2017;
       } else {
